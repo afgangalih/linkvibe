@@ -2,8 +2,30 @@
 
 import { useLinkStore } from "@/store/use-link-store";
 import { useEffect, useState } from "react";
-import { Battery, Wifi, Link2 } from "lucide-react";
+import { Battery, Wifi, Link2, Github, Instagram, Linkedin, Twitter, Youtube, Facebook } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Inter, Merriweather, Roboto_Mono, Outfit } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
+const merriweather = Merriweather({ weight: ["400", "700"], subsets: ["latin"] });
+const robotoMono = Roboto_Mono({ subsets: ["latin"] });
+const outfit = Outfit({ subsets: ["latin"] });
+
+const fontMap: Record<string, any> = {
+    'Inter': inter,
+    'Merriweather': merriweather,
+    'Roboto Mono': robotoMono,
+    'Outfit': outfit,
+};
+
+const socialIcons: Record<string, any> = {
+    instagram: Instagram,
+    twitter: Twitter,
+    linkedin: Linkedin,
+    github: Github,
+    youtube: Youtube,
+    facebook: Facebook,
+};
 
 // Template Style Definitions
 const templates: Record<string, any> = {
@@ -12,7 +34,6 @@ const templates: Record<string, any> = {
         text: "text-white",
         card: "bg-zinc-900 border border-zinc-800",
         cardHover: "hover:scale-[1.02] active:scale-[0.98]",
-        font: "font-sans",
         button: "rounded-xl",
     },
     glassmorphism: {
@@ -20,7 +41,6 @@ const templates: Record<string, any> = {
         text: "text-white",
         card: "bg-white/10 border border-white/20 backdrop-blur-md",
         cardHover: "hover:bg-white/20 hover:scale-[1.02]",
-        font: "font-sans",
         button: "rounded-2xl",
     },
     neon: {
@@ -28,7 +48,6 @@ const templates: Record<string, any> = {
         text: "text-cyan-400",
         card: "bg-black border border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.15)]",
         cardHover: "hover:shadow-[0_0_25px_rgba(6,182,212,0.3)] hover:scale-[1.02]",
-        font: "font-mono",
         button: "rounded-none uppercase tracking-widest",
     },
     retro: {
@@ -36,15 +55,20 @@ const templates: Record<string, any> = {
         text: "text-[#2a2a2a]",
         card: "bg-[#e6e6d0] border-2 border-[#2a2a2a] shadow-[4px_4px_0px_#2a2a2a]",
         cardHover: "hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#2a2a2a] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none",
-        font: "font-serif",
         button: "rounded-sm",
     }
 };
 
-export function PreviewCanvas() {
+interface PreviewCanvasProps {
+    scale?: number;
+}
+
+export function PreviewCanvas({ scale = 1 }: PreviewCanvasProps) {
   const links = useLinkStore((state) => state.links);
+  const socials = useLinkStore((state) => state.socials);
   const profile = useLinkStore((state) => state.profile);
   const currentTemplate = useLinkStore((state) => state.currentTemplate);
+  const currentFont = useLinkStore((state) => state.currentFont);
   
   const [mounted, setMounted] = useState(false);
   
@@ -55,13 +79,17 @@ export function PreviewCanvas() {
   if (!mounted) return null;
 
   const theme = templates[currentTemplate] || templates.minimalist;
+  const activeFont = fontMap[currentFont] || inter;
+  
+  const activeSocials = socials.filter(s => s.isActive);
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center p-8">
-      {/* Mobile Device Mockup - Floating Effect */}
+    <div className="relative w-full h-full flex items-center justify-center p-8 overflow-hidden">
+      {/* Mobile Device Mockup - Floating Effect with CSS Scale */}
       <motion.div 
         layout
-        className="w-[320px] h-[640px] border-[8px] border-[#1a1a1a] rounded-[3rem] bg-black overflow-hidden shadow-2xl relative ring-1 ring-white/10 transition-all duration-500"
+        style={{ transform: `scale(${scale})` }}
+        className="w-[320px] h-[640px] border-[8px] border-[#1a1a1a] rounded-[3rem] bg-black overflow-hidden shadow-2xl relative ring-1 ring-white/10 transition-transform duration-300 ease-out origin-center"
       >
         
         {/* Notch/Status Bar */}
@@ -75,12 +103,12 @@ export function PreviewCanvas() {
 
         {/* Dynamic Content Container - Animated Background Transition */}
         <motion.div 
-            className={`h-full w-full overflow-y-auto relative no-scrollbar transition-colors duration-500 ${theme.bg} ${theme.text} ${theme.font}`}
+            className={`h-full w-full overflow-y-auto relative no-scrollbar transition-colors duration-500 ${theme.bg} ${theme.text} ${activeFont.className}`}
             initial={false}
-            animate={{ backgroundColor: theme.bg }} // Although class changes, explicit animate helps sometimes
+            animate={{ backgroundColor: theme.bg }}
         >
             
-            <div className="pt-16 pb-12 px-5 flex flex-col items-center min-h-full relative z-10 text-inherit">
+            <div className="pt-16 pb-6 px-5 flex flex-col items-center min-h-full relative z-10 text-inherit">
                 
                 {/* Profile Header */}
                 <div className="flex flex-col items-center text-center space-y-4 mb-8 w-full">
@@ -98,7 +126,7 @@ export function PreviewCanvas() {
                 </div>
 
                 {/* Links List */}
-                <div className="w-full space-y-3">
+                <div className="w-full space-y-3 mb-8">
                     <AnimatePresence mode="popLayout">
                         {links.filter(l => l.isActive).map((link) => (
                             <motion.a
@@ -127,8 +155,28 @@ export function PreviewCanvas() {
                     </AnimatePresence>
                 </div>
 
+                {/* Social Icons Footer */}
+                {activeSocials.length > 0 && (
+                    <div className="flex flex-wrap justify-center gap-4 mb-8">
+                        {activeSocials.map((social) => {
+                             const Icon = socialIcons[social.platform] || Link2;
+                             return (
+                                 <a 
+                                    key={social.id}
+                                    href={social.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-2 opacity-70 hover:opacity-100 hover:scale-110 transition-all duration-200"
+                                >
+                                    <Icon className="w-5 h-5" />
+                                </a>
+                             )
+                        })}
+                    </div>
+                )}
+
                 {/* Footer Branding */}
-                <div className="mt-auto pt-8 pb-4 flex items-center justify-center gap-1.5 opacity-50">
+                <div className="mt-auto pt-4 pb-2 flex items-center justify-center gap-1.5 opacity-50">
                     <Link2 className="w-3 h-3" />
                     <span className="text-[10px] font-medium tracking-wide">LinkVibe</span>
                 </div>

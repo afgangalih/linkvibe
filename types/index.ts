@@ -7,6 +7,13 @@ export interface Link {
   isActive: boolean;
 }
 
+export interface SocialLink {
+  id: string;
+  platform: string; // 'twitter' | 'instagram' | 'linkedin' | 'github'
+  url: string;
+  isActive: boolean;
+}
+
 export interface Profile {
   username: string;
   displayName?: string;
@@ -17,9 +24,14 @@ export interface Profile {
 
 export interface Store {
   links: Link[];
+  socials: SocialLink[];
   profile: Profile;
   addLink: (link: Link) => void;
   updateLink: (id: string, updates: Partial<Link>) => void;
   removeLink: (id: string) => void;
+  updateSocial: (platform: string, url: string, isActive: boolean) => void;
   setProfile: (profile: Partial<Profile>) => void;
+  // Font State
+  currentFont: string;
+  setFont: (font: string) => void;
 }
