@@ -6,13 +6,7 @@ import { useLinkStore } from "@/store/use-link-store";
 import { AIBioGenerator } from "./ai-bio-generator";
 import { Palette, Type, LayoutTemplate } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const themes = [
-  { id: "minimalist", name: "Minimalist", type: 'light', color: "bg-zinc-900 border-zinc-700" },
-  { id: "glassmorphism", name: "Glass", type: 'dark', color: "bg-gradient-to-br from-indigo-900 to-purple-900 border-white/20" },
-  { id: "neon", name: "Neon", type: 'dark', color: "bg-black border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.3)]" },
-  { id: "retro", name: "Retro", type: 'light', color: "bg-[#e6e6d0] border-[#2a2a2a]" },
-];
+import { TemplateThemes } from "./templates/template-registry";
 
 const fonts = [
     { id: 'Inter', name: 'Inter', sub: 'Clean & Modern' },
@@ -33,7 +27,7 @@ export function DesignPanel() {
       
       <ScrollArea className="flex-1">
         <div className="p-6 space-y-8 pb-32">
-            {/* AI Section (Simplified) */}
+            {/* AI Section */}
             <section>
                 <AIBioGenerator />
             </section>
@@ -57,7 +51,7 @@ export function DesignPanel() {
                     {['all', 'dark', 'light'].map((tab) => (
                         <TabsContent key={tab} value={tab} className="mt-0">
                              <div className="grid grid-cols-2 gap-3">
-                                {themes.filter(t => tab === 'all' || t.type === tab).map((theme) => (
+                                {TemplateThemes.filter(t => tab === 'all' || t.type === tab).map((theme) => (
                                     <div
                                         key={theme.id}
                                         onClick={() => setTemplate(theme.id)}

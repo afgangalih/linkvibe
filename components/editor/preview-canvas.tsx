@@ -2,9 +2,11 @@
 
 import { useLinkStore } from "@/store/use-link-store";
 import { useEffect, useState } from "react";
-import { Battery, Wifi, Link2, Github, Instagram, Linkedin, Twitter, Youtube, Facebook } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { Battery, Wifi } from "lucide-react";
+import { motion } from "framer-motion";
 import { Inter, Merriweather, Roboto_Mono, Outfit } from "next/font/google";
+import { TemplateRegistry } from "./templates/template-registry";
+import { MinimalistTemplate } from "./templates/minimalist-template";
 
 const inter = Inter({ subsets: ["latin"] });
 const merriweather = Merriweather({ weight: ["400", "700"], subsets: ["latin"] });
@@ -18,57 +20,12 @@ const fontMap: Record<string, any> = {
     'Outfit': outfit,
 };
 
-const socialIcons: Record<string, any> = {
-    instagram: Instagram,
-    twitter: Twitter,
-    linkedin: Linkedin,
-    github: Github,
-    youtube: Youtube,
-    facebook: Facebook,
-};
-
-// Template Style Definitions
-const templates: Record<string, any> = {
-    minimalist: {
-        bg: "bg-black",
-        text: "text-white",
-        card: "bg-zinc-900 border border-zinc-800",
-        cardHover: "hover:scale-[1.02] active:scale-[0.98]",
-        button: "rounded-xl",
-    },
-    glassmorphism: {
-        bg: "bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900",
-        text: "text-white",
-        card: "bg-white/10 border border-white/20 backdrop-blur-md",
-        cardHover: "hover:bg-white/20 hover:scale-[1.02]",
-        button: "rounded-2xl",
-    },
-    neon: {
-        bg: "bg-[#050505]",
-        text: "text-cyan-400",
-        card: "bg-black border border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.15)]",
-        cardHover: "hover:shadow-[0_0_25px_rgba(6,182,212,0.3)] hover:scale-[1.02]",
-        button: "rounded-none uppercase tracking-widest",
-    },
-    retro: {
-        bg: "bg-[#f0f0e0]",
-        text: "text-[#2a2a2a]",
-        card: "bg-[#e6e6d0] border-2 border-[#2a2a2a] shadow-[4px_4px_0px_#2a2a2a]",
-        cardHover: "hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#2a2a2a] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none",
-        button: "rounded-sm",
-    }
-};
-
 interface PreviewCanvasProps {
     scale?: number;
 }
 
 export function PreviewCanvas({ scale = 1 }: PreviewCanvasProps) {
-  const links = useLinkStore((state) => state.links);
-  const socials = useLinkStore((state) => state.socials);
-  const profile = useLinkStore((state) => state.profile);
-  const currentTemplate = useLinkStore((state) => state.currentTemplate);
-  const currentFont = useLinkStore((state) => state.currentFont);
+  const { links, socials, profile, currentTemplate, currentFont } = useLinkStore();
   
   const [mounted, setMounted] = useState(false);
   
@@ -78,22 +35,22 @@ export function PreviewCanvas({ scale = 1 }: PreviewCanvasProps) {
 
   if (!mounted) return null;
 
-  const theme = templates[currentTemplate] || templates.minimalist;
+  const ActiveTemplate = TemplateRegistry[currentTemplate] || MinimalistTemplate;
   const activeFont = fontMap[currentFont] || inter;
   
-  const activeSocials = socials.filter(s => s.isActive);
+  const isLightMode = ['retro', 'liquid-pink', 'liquid-mint'].includes(currentTemplate);
 
   return (
     <div className="relative w-full h-full flex items-center justify-center p-8 overflow-hidden">
-      {/* Mobile Device Mockup - Floating Effect with CSS Scale */}
+      {/* Mobile Device Mockup */}
       <motion.div 
         layout
         style={{ transform: `scale(${scale})` }}
-        className="w-[320px] h-[640px] border-[8px] border-[#1a1a1a] rounded-[3rem] bg-black overflow-hidden shadow-2xl relative ring-1 ring-white/10 transition-transform duration-300 ease-out origin-center"
+        className="w-[320px] h-[640px] border-[8px] border-[#1a1a1a] rounded-[3rem] bg-black overflow-hidden shadow-2xl relative ring-1 ring-white/10 transition-transform duration-300 ease-out origin-center block"
       >
         
         {/* Notch/Status Bar */}
-        <div className={`absolute top-0 w-full z-20 px-6 py-3 flex justify-between items-center text-[10px] subpixel-antialiased font-medium transition-colors duration-500 ${currentTemplate === 'retro' ? 'text-black' : 'text-white'}`}>
+        <div className={`absolute top-0 w-full z-20 px-6 py-3 flex justify-between items-center text-[10px] subpixel-antialiased font-medium transition-colors duration-500 ${isLightMode ? 'text-black' : 'text-white'}`}>
             <span>9:41</span>
             <div className="flex items-center gap-1.5">
                 <Wifi className="w-3 h-3" />
@@ -101,88 +58,16 @@ export function PreviewCanvas({ scale = 1 }: PreviewCanvasProps) {
             </div>
         </div>
 
-        {/* Dynamic Content Container - Animated Background Transition */}
-        <motion.div 
-            className={`h-full w-full overflow-y-auto relative no-scrollbar transition-colors duration-500 ${theme.bg} ${theme.text} ${activeFont.className}`}
-            initial={false}
-            animate={{ backgroundColor: theme.bg }}
-        >
-            
-            <div className="pt-16 pb-6 px-5 flex flex-col items-center min-h-full relative z-10 text-inherit">
-                
-                {/* Profile Header */}
-                <div className="flex flex-col items-center text-center space-y-4 mb-8 w-full">
-                    <div className={`w-24 h-24 flex items-center justify-center overflow-hidden relative ${currentTemplate === 'retro' ? 'rounded-full border-2 border-[#2a2a2a]' : 'rounded-full bg-white/5 border border-white/10'}`}>
-                         {profile.avatarUrl ? (
-                             <img src={profile.avatarUrl} alt="Profile" className="w-full h-full object-cover" />
-                         ) : (
-                             <div className={`w-full h-full ${currentTemplate === 'retro' ? 'bg-[#d0d0c0]' : 'bg-gradient-to-tr from-zinc-800 to-zinc-900'}`} />
-                         )}
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-bold tracking-tight">{profile.displayName || "@username"}</h1>
-                        <p className={`text-sm line-clamp-2 mt-1 px-2 opacity-70`}>{profile.bio || "Welcome to my page"}</p>
-                    </div>
-                </div>
-
-                {/* Links List */}
-                <div className="w-full space-y-3 mb-8">
-                    <AnimatePresence mode="popLayout">
-                        {links.filter(l => l.isActive).map((link) => (
-                            <motion.a
-                                layout
-                                key={link.id}
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                className={`block w-full text-center text-sm font-medium transition-all duration-200 overflow-hidden group relative flex items-center justify-center ${theme.card} ${theme.cardHover} ${theme.button} ${link.image ? 'h-16 p-1' : 'p-3.5'}`}
-                            >
-                                {link.image ? (
-                                    <div className="flex items-center w-full h-full">
-                                        <div className={`w-14 h-14 overflow-hidden flex-shrink-0 bg-black/20 ${theme.button}`}>
-                                            <img src={link.image} alt="" className="w-full h-full object-cover" />
-                                        </div>
-                                        <span className="flex-1 text-center pr-14 truncate">{link.title || "Untitled Link"}</span>
-                                    </div>
-                                ) : (
-                                    <span>{link.title || "Untitled Link"}</span>
-                                )}
-                            </motion.a>
-                        ))}
-                    </AnimatePresence>
-                </div>
-
-                {/* Social Icons Footer */}
-                {activeSocials.length > 0 && (
-                    <div className="flex flex-wrap justify-center gap-4 mb-8">
-                        {activeSocials.map((social) => {
-                             const Icon = socialIcons[social.platform] || Link2;
-                             return (
-                                 <a 
-                                    key={social.id}
-                                    href={social.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="p-2 opacity-70 hover:opacity-100 hover:scale-110 transition-all duration-200"
-                                >
-                                    <Icon className="w-5 h-5" />
-                                </a>
-                             )
-                        })}
-                    </div>
-                )}
-
-                {/* Footer Branding */}
-                <div className="mt-auto pt-4 pb-2 flex items-center justify-center gap-1.5 opacity-50">
-                    <Link2 className="w-3 h-3" />
-                    <span className="text-[10px] font-medium tracking-wide">LinkVibe</span>
-                </div>
-
-            </div>
-        </motion.div>
+        {/* Template Render */}
+        <div className="h-full w-full overflow-y-auto relative no-scrollbar bg-black">
+             <ActiveTemplate 
+                profile={profile}
+                links={links}
+                socials={socials}
+                font={activeFont.className}
+                theme={currentTemplate} 
+             />
+        </div>
 
         {/* Custom Scrollbar Hide */}
         <style jsx>{`
