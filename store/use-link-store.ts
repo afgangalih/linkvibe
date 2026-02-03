@@ -6,11 +6,18 @@ const defaultProfile: Profile = {
   theme: 'light',
 };
 
-export const useLinkStore = create<Store>((set) => ({
+interface ExtendedStore extends Store {
+    reorderLinks: (links: Link[]) => void;
+    currentTemplate: string;
+    setTemplate: (template: string) => void;
+}
+
+export const useLinkStore = create<ExtendedStore>((set) => ({
   links: [],
   profile: defaultProfile,
+  currentTemplate: 'minimalist',
   addLink: (link) =>
-    set((state) => ({ links: [...state.links, link] })),
+    set((state) => ({ links: [...state.links, { ...link, image: "" }] })),
   updateLink: (id, updates) =>
     set((state) => ({
       links: state.links.map((link) =>
@@ -23,4 +30,6 @@ export const useLinkStore = create<Store>((set) => ({
     })),
   setProfile: (updates) =>
     set((state) => ({ profile: { ...state.profile, ...updates } })),
+  reorderLinks: (newLinks) => set({ links: newLinks }),
+  setTemplate: (template) => set({ currentTemplate: template }),
 }));

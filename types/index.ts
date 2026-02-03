@@ -3,6 +3,7 @@ export interface Link {
   title: string;
   url: string;
   icon: string; // lucide icon name or url
+  image?: string; // URL for the link thumbnail
   isActive: boolean;
 }
 

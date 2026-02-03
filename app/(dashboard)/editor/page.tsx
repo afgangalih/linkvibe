@@ -1,51 +1,37 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card } from "@/components/ui/card";
+import { EditorNavbar } from "@/components/editor/editor-navbar";
+import { ProfileForm } from "@/components/editor/profile-form";
+import { LinksEditor } from "@/components/editor/links-editor";
+import { PreviewCanvas } from "@/components/editor/preview-canvas";
 
 export default function EditorPage() {
   return (
-    <div className="h-full flex">
-      {/* Left: Editor Column */}
-      <div className="flex-1 border-r bg-background">
-        <ScrollArea className="h-full">
-            <div className="p-8 max-w-2xl mx-auto space-y-6">
-                <div>
-                    <h2 className="text-2xl font-bold">Links</h2>
-                    <p className="text-muted-foreground">Manage your links here.</p>
-                </div>
-                
-                {/* Editor Content Placeholder */}
-                <Card className="p-6">
-                    <p>Link Editor Form will go here.</p>
-                </Card>
-            </div>
-        </ScrollArea>
-      </div>
+    <div className="h-screen bg-black flex flex-col overflow-hidden">
+      {/* Global Toolbar */}
+      <EditorNavbar />
 
-      {/* Right: Preview Column */}
-      <div className="w-[400px] bg-muted/30 hidden lg:flex items-center justify-center relative">
-        <div className="sticky top-0 p-6">
-            <div className="w-[300px] h-[600px] border-8 border-gray-900 rounded-[3rem] bg-white overflow-hidden shadow-xl relative">
-                {/* Mobile Status Bar Simulation */}
-                <div className="absolute top-0 w-full h-6 bg-gray-100 border-b flex justify-center items-center text-[10px] text-gray-500">
-                    LinkVibe
-                </div>
-                
-                {/* Mobile Preview Content */}
-                <div className="mt-8 p-4 text-center">
-                    <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-4"></div>
-                    <div className="h-4 bg-gray-200 w-3/4 mx-auto mb-2 rounded"></div>
-                    <div className="h-3 bg-gray-100 w-1/2 mx-auto rounded"></div>
-                    
-                    <div className="mt-8 space-y-2">
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="h-12 bg-gray-50 border rounded flex items-center justify-center text-sm text-gray-400">
-                                Link {i}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
+      {/* Main Workspace */}
+      <div className="flex-1 flex overflow-hidden">
+        
+        {/* Left Pane: Editor (60%) */}
+        <div className="flex-1 lg:flex-[0.6] min-w-0 border-r border-zinc-900 bg-black relative z-10 flex flex-col">
+           <ScrollArea className="flex-1">
+              <div className="w-full max-w-2xl mx-auto p-6 md:p-10 space-y-8 pb-32">
+                  <ProfileForm />
+                  <div className="h-px bg-zinc-900/50 my-6" /> {/* Divider */}
+                  <LinksEditor />
+              </div>
+           </ScrollArea>
         </div>
+
+        {/* Right Pane: Live Preview (40%) */}
+        <div className="hidden lg:flex lg:flex-[0.4] bg-[#050505] items-center justify-center relative">
+          {/* Subtle Grid Background */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"></div>
+          
+          <PreviewCanvas />
+        </div>
+      
       </div>
     </div>
   );
