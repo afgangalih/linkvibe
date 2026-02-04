@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Eye, Share2, MoreHorizontal, User } from "lucide-react";
+import { Eye, Share2, MoreHorizontal, User, CheckCircle2, RotateCw } from "lucide-react";
+import { useLinkStore } from "@/store/use-link-store";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +10,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+
 export function EditorNavbar() {
+  const syncStatus = useLinkStore((state) => state.syncStatus);
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
   return (
     <header className="h-16 w-full border-b border-zinc-900 bg-black/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-50">
       {/* Brand & Context */}
@@ -17,14 +29,19 @@ export function EditorNavbar() {
         <span className="text-white font-bold tracking-tighter text-xl">LinkVibe</span>
         <div className="h-4 w-[1px] bg-zinc-800 hidden md:block" />
         <div className="hidden md:flex items-center gap-2">
-          <div className="flex -space-x-2">
-            {[1, 2].map((i) => (
-              <div key={i} className="w-5 h-5 rounded-full border-2 border-black bg-zinc-800 flex items-center justify-center">
-                <User className="w-2.5 h-2.5 text-zinc-500" />
-              </div>
-            ))}
-          </div>
-          <span className="text-[10px] text-zinc-500 font-medium">Viewing as Editor</span>
+           {syncStatus === 'saving' ? (
+                <div className="flex items-center gap-2 text-zinc-500">
+                    <RotateCw className="w-3 h-3 animate-spin" />
+                    <span className="text-[10px] font-medium uppercase tracking-wider">Syncing...</span>
+                </div>
+           ) : syncStatus === 'saved' ? (
+                <div className="flex items-center gap-2 text-zinc-500">
+                    <CheckCircle2 className="w-3 h-3 text-green-500" />
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-green-500/80">Changes Saved</span>
+                </div>
+           ) : (
+             <span className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider">Ready</span>
+           )}
         </div>
       </div>
 
@@ -46,7 +63,12 @@ export function EditorNavbar() {
             <DropdownMenuContent align="end" className="bg-zinc-950 border-zinc-800 text-zinc-400">
               <DropdownMenuItem className="focus:bg-zinc-900 focus:text-white">Analytics</DropdownMenuItem>
               <DropdownMenuItem className="focus:bg-zinc-900 focus:text-white">Settings</DropdownMenuItem>
-              <DropdownMenuItem className="focus:bg-red-950 focus:text-red-400">Sign Out</DropdownMenuItem>
+              <DropdownMenuItem 
+                className="focus:bg-red-950 focus:text-red-400"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

@@ -22,6 +22,7 @@ export default function RootLayout({
     <html lang="en" className="dark" suppressHydrationWarning>
       <body
         className={`${inter.variable} antialiased bg-background text-foreground tracking-tight`}
+        suppressHydrationWarning
       >
         {children}
       </body>

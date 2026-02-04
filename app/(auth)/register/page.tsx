@@ -2,23 +2,83 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Eye, EyeOff, ArrowLeft } from "lucide-react";
-import { motion } from "framer-motion";
+import { Loader2, Eye, EyeOff, ArrowLeft, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    setError(null);
+    
+    try {
+        // 1. Sign Up
+        const { data, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password
+        });
+        
+        if (signUpError) {
+            setError(signUpError.message);
+            return;
+        }
+
+        if (data.user) {
+            // 2. Create Initial Profile
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .insert({
+                    id: data.user.id,
+                    username: email.split('@')[0], // Default username
+                    display_name: 'New User',
+                    updated_at: new Date().toISOString()
+                });
+            
+            if (profileError) {
+                console.error("Profile Creation Failed:", profileError);
+                // We don't block the user, but we log it. 
+                // Alternatively, we could show an error, but let's assume they can fix it in editor.
+            }
+        }
+
+        // 3. Redirect
+        router.push("/editor");
+    } catch (err) {
+        setError("An unexpected error occurred. Please try again.");
+        console.error("Unexpected Error:", err);
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback` 
+            }
+        });
+        if (error) setError(error.message);
+    } catch (err) {
+        setError("Could not connect to Google.");
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return (
@@ -51,6 +111,21 @@ export default function RegisterPage() {
             </div>
     
             <form onSubmit={handleSubmit} className="space-y-5">
+              
+              <AnimatePresence>
+                {error && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl flex items-center gap-3 text-xs"
+                    >
+                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                        <p>{error}</p>
+                    </motion.div>
+                )}
+              </AnimatePresence>
+
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-zinc-400 text-xs uppercase tracking-wider font-medium">Email</Label>
                 <Input
@@ -71,6 +146,8 @@ export default function RegisterPage() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="bg-black/40 border-zinc-800 text-white focus:border-white/20 focus:ring-0 rounded-xl h-11 pr-10 transition-all placeholder:text-zinc-600"
                     required
                   />
@@ -112,6 +189,7 @@ export default function RegisterPage() {
 
             <Button 
               variant="outline" 
+              onClick={handleGoogleLogin}
               className="w-full h-11 rounded-xl bg-transparent border-zinc-700 text-zinc-300 hover:bg-white/5 hover:text-white hover:border-zinc-500 transition-all flex items-center justify-center gap-2"
             >
               <svg className="h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path></svg>

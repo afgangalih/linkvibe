@@ -9,9 +9,17 @@ import { PreviewCanvas } from "@/components/editor/preview-canvas";
 import { DesignPanel } from "@/components/editor/design-panel";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
+import { useEffect } from "react";
+import { useLinkStore } from "@/store/use-link-store";
 
 export default function EditorPage() {
   const [zoom, setZoom] = useState(1);
+  const fetchUserPage = useLinkStore((state) => state.fetchUserPage);
+
+  useEffect(() => {
+    // Determine user session in store logic
+    fetchUserPage(''); 
+  }, []);
 
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.1, 1.5));
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.5));
