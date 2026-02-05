@@ -40,31 +40,64 @@ const triggerSync = (get: () => ExtendedStore, set: (partial: Partial<ExtendedSt
 
         try {
             // Upsert Profile
-            // We use the user.id as the primary key reference (assuming profiles.id === auth.users.id)
+            // Using UPSERT guarantees that if the row exists (by ID), it updates; if not, it inserts.
+            // This relies on 'id' being the primary key matching 'auth.users.id'.
             const { error: profileError } = await supabase
                 .from('profiles')
                 .upsert({ 
-                    id: user.id, // VITAL: Link to Auth User
-                    username: state.profile.username,
+                    id: user.id,
+                    username: state.profile.username || user.email?.split('@')[0] || 'user',
                     display_name: state.profile.displayName,
                     bio: state.profile.bio,
                     avatar_url: state.profile.avatarUrl,
-                    theme: state.currentTemplate,
-                    font: state.currentFont,
+                    theme_id: state.currentTemplate, // Corrected Column Name
+                    font_id: state.currentFont,     // Corrected Column Name
                     updated_at: new Date().toISOString()
                 }, { onConflict: 'id' });
 
-            if (profileError) throw profileError;
+            if (profileError) {
+                console.error("Profile Sync Error:", profileError.message);
+                throw profileError;
+            }
 
-            // Upsert Links 
-            // Ideally we'd sync individual items, but for simplicity we'll just log success
-            // In a real app we'd need to iterate state.links and upsert each with user_id: user.id
+            // 2. Upsert Links
+            const { error: linksError } = await supabase
+                .from('links')
+                .upsert(
+                    state.links.map((link, index) => ({
+                        id: link.id,
+                        user_id: user.id,
+                        title: link.title,
+                        url: link.url,
+                        icon: link.icon,
+                        image: link.image,
+                        is_active: link.isActive,
+                        sort_order: index // Persist order
+                    })),
+                    { onConflict: 'id' }
+                );
+
+            if (linksError) throw linksError;
+
+            // 3. Upsert Socials
+            const { error: socialsError } = await supabase
+                .from('social_links')
+                .upsert(
+                    state.socials.map((social) => ({
+                        id: social.id,
+                        user_id: user.id,
+                        platform: social.platform,
+                        url: social.url,
+                        is_active: social.isActive
+                    })),
+                    { onConflict: 'id' }
+                );
             
-            // For now, ensuring Profile persistence is the crucial first step.
+            if (socialsError) throw socialsError;
             
             set({ syncStatus: 'saved' });
         } catch (error) {
-            console.error("Sync Error:", error);
+            console.error("Sync Critical Error:", error);
             set({ syncStatus: 'error' });
         }
     }, 1000);
@@ -135,26 +168,57 @@ export const useLinkStore = create<ExtendedStore>((set, get) => ({
       
       if (user) {
           console.log("Hydrating active user:", user.id);
-          const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
+          
+          // Parallel Fetching for Performance
+          const [profileResponse, linksResponse, socialsResponse] = await Promise.all([
+              supabase.from('profiles').select('*').eq('id', user.id).single(),
+              supabase.from('links').select('*').eq('user_id', user.id).order('sort_order', { ascending: true }),
+              supabase.from('social_links').select('*').eq('user_id', user.id)
+          ]);
 
-          if (data && !error) {
+          const { data: profileData, error: profileError } = profileResponse;
+          const { data: linksData, error: linksError } = linksResponse;
+          const { data: socialsData, error: socialsError } = socialsResponse;
+
+          if (profileData && !profileError) {
+             // 1. Set Profile
              set({
                  profile: {
-                     username: data.username || '',
-                     displayName: data.display_name || '',
-                     bio: data.bio || '',
-                     avatarUrl: data.avatar_url || '',
-                     theme: data.theme || 'light'
+                     username: profileData.username ?? '',
+                     displayName: profileData.display_name ?? '',
+                     bio: profileData.bio ?? '',
+                     avatarUrl: profileData.avatar_url ?? '',
+                     theme: profileData.theme_id ?? 'light'
                  },
-                 currentTemplate: data.theme || 'minimalist',
-                 currentFont: data.font || 'Inter'
+                 currentTemplate: profileData.theme_id ?? 'minimalist',
+                 currentFont: profileData.font_id ?? 'Inter'
              });
-             // Trigger fetch links here as well if needed
           }
+
+          if (linksData && !linksError) {
+              // 2. Set Links (Map DB columns to State)
+              const mappedLinks = linksData.map((l: any) => ({
+                  id: l.id,
+                  title: l.title,
+                  url: l.url,
+                  isActive: l.is_active,
+                  image: l.image || "",
+                  icon: l.icon ?? ""
+              }));
+              set({ links: mappedLinks });
+          }
+
+          if (socialsData && !socialsError) {
+              // 3. Set Socials
+              const mappedSocials = socialsData.map((s: any) => ({
+                  id: s.id,
+                  platform: s.platform,
+                  url: s.url,
+                  isActive: s.is_active
+              }));
+              set({ socials: mappedSocials });
+          }
+          
       } else {
           console.log("No active session, fetching public page:", username);
           // Public fetch logic would go here

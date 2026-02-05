@@ -4,6 +4,7 @@ import { useLinkStore } from "@/store/use-link-store";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { AvatarUpload } from "./avatar-upload";
 
 export function ProfileForm() {
   const profile = useLinkStore((state) => state.profile);
@@ -15,6 +16,11 @@ export function ProfileForm() {
         <h2 className="text-xl font-semibold text-white tracking-tight">Profile</h2>
         <p className="text-sm text-zinc-400">Manage your public profile information.</p>
       </div>
+
+      <AvatarUpload 
+        avatarUrl={profile.avatarUrl}
+        onUploadComplete={(url) => setProfile({ avatarUrl: url ?? "" })}
+      />
 
       <div className="space-y-4">
         {/* Username */}
