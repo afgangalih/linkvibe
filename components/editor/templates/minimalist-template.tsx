@@ -1,6 +1,7 @@
 "use client";
 
 import { TemplateProps } from "./types";
+import { getIcon } from "./icon-map";
 import { Link2, Link as LinkIcon, Instagram, Twitter, Linkedin, Github, Youtube, Facebook } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -38,7 +39,9 @@ export function MinimalistTemplate({ profile, links, socials, font }: TemplatePr
       {/* Links */}
       <div className="w-full space-y-3 mb-8">
         <AnimatePresence mode="popLayout">
-          {activeLinks.map((link) => (
+          {activeLinks.map((link) => {
+            const Icon = link.icon ? getIcon(link.icon) : null;
+            return (
             <motion.a
               layout
               key={link.id}
@@ -55,13 +58,19 @@ export function MinimalistTemplate({ profile, links, socials, font }: TemplatePr
                   <div className="w-14 h-14 overflow-hidden flex-shrink-0 bg-black/20 rounded-xl">
                     <img src={link.image} alt="" className="w-full h-full object-cover" />
                   </div>
-                  <span className="flex-1 text-center pr-14 truncate">{link.title || "Untitled Link"}</span>
+                  <div className="flex-1 flex items-center justify-center pr-14">
+                      {Icon && <Icon className="w-4 h-4 mr-2 opacity-80" />}
+                      <span className="truncate">{link.title || "Untitled Link"}</span>
+                  </div>
                 </div>
               ) : (
-                <span>{link.title || "Untitled Link"}</span>
+                <div className="flex items-center justify-center gap-2">
+                    {Icon && <Icon className="w-4 h-4 opacity-80" />}
+                    <span>{link.title || "Untitled Link"}</span>
+                </div>
               )}
             </motion.a>
-          ))}
+          )})}
         </AnimatePresence>
       </div>
 

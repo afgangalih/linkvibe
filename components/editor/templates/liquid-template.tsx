@@ -1,6 +1,7 @@
 "use client";
 
 import { TemplateProps } from "./types";
+import { getIcon } from "./icon-map";
 import { Link2, Link as LinkIcon, Instagram, Twitter, Linkedin, Github, Youtube, Facebook } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -78,7 +79,9 @@ export function LiquidTemplate({ profile, links, socials, font, theme = "liquid-
         {/* Links */}
         <div className="w-full space-y-3 mb-8">
             <AnimatePresence mode="popLayout">
-            {activeLinks.map((link) => (
+            {activeLinks.map((link) => {
+                const Icon = link.icon ? getIcon(link.icon) : null;
+                return (
                 <motion.a
                 layout
                 key={link.id}
@@ -95,13 +98,28 @@ export function LiquidTemplate({ profile, links, socials, font, theme = "liquid-
                     <div className="w-12 h-12 overflow-hidden flex-shrink-0 bg-black/10 rounded-lg">
                         <img src={link.image} alt="" className="w-full h-full object-cover" />
                     </div>
-                    <span className="flex-1 text-center pr-12 truncate">{link.title || "Untitled Link"}</span>
+                    <div className="flex-1 flex items-center justify-center pr-12">
+                         {Icon && <Icon className="w-4 h-4 mr-2 opacity-80" />}
+                         <span className="truncate max-w-[150px]">{link.title || "Untitled Link"}</span>
+                    </div>
                     </div>
                 ) : (
-                    <span>{link.title || "Untitled Link"}</span>
+                    <div className="flex items-center justify-center gap-2">
+                        {/* Icon */}
+                        {Icon && (
+                             <motion.div
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="opacity-90"
+                             >
+                                <Icon className="w-5 h-5" />
+                             </motion.div>
+                        )}
+                        <span>{link.title || "Untitled Link"}</span>
+                    </div>
                 )}
                 </motion.a>
-            ))}
+            )})}
             </AnimatePresence>
         </div>
 
