@@ -60,24 +60,48 @@ const triggerSync = (get: () => ExtendedStore, set: (partial: Partial<ExtendedSt
                 throw profileError;
             }
 
-            // 2. Upsert Links
-            const { error: linksError } = await supabase
-                .from('links')
-                .upsert(
-                    state.links.map((link, index) => ({
-                        id: link.id,
-                        user_id: user.id,
-                        title: link.title,
-                        url: link.url,
-                        icon: link.icon,
-                        image: link.image,
-                        is_active: link.isActive,
-                        sort_order: index // Persist order
-                    })),
-                    { onConflict: 'id' }
-                );
+            // 2. Sync Links (Delete Missing + Upsert Active)
+            const currentIds = state.links.map(l => l.id);
+            
+            // A. Delete links not in state
+            if (currentIds.length > 0) {
+                 const { error: deleteError } = await supabase
+                    .from('links')
+                    .delete()
+                    .eq('user_id', user.id)
+                    .not('id', 'in', `(${currentIds.join(',')})`);
+                 
+                 if (deleteError) throw deleteError;
+            } else {
+                 // If no links in state, delete all for user
+                 const { error: deleteAllError } = await supabase
+                    .from('links')
+                    .delete()
+                    .eq('user_id', user.id);
+                 
+                 if (deleteAllError) throw deleteAllError;
+            }
 
-            if (linksError) throw linksError;
+            // B. Upsert remaining
+            if (state.links.length > 0) {
+                const { error: linksError } = await supabase
+                    .from('links')
+                    .upsert(
+                        state.links.map((link, index) => ({
+                            id: link.id,
+                            user_id: user.id,
+                            title: link.title,
+                            url: link.url,
+                            icon: link.icon,
+                            image: link.image,
+                            is_active: link.isActive,
+                            sort_order: index // Persist order
+                        })),
+                        { onConflict: 'id' }
+                    );
+
+                if (linksError) throw linksError;
+            }
 
             // 3. Upsert Socials
             const { error: socialsError } = await supabase
@@ -113,7 +137,7 @@ export const useLinkStore = create<ExtendedStore>((set, get) => ({
 
   // Actions wrapped with Sync Trigger
   addLink: (link) => {
-    set((state) => ({ links: [...state.links, { ...link, image: "" }] }));
+    set((state) => ({ links: [...state.links, { ...link, image: "", icon: "" }] }));
     triggerSync(get, set);
   },
   updateLink: (id, updates) => {

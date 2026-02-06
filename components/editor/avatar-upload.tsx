@@ -3,6 +3,8 @@ import { Camera, Loader2, User, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 
+import { ConfirmModal } from "@/components/ui/confirm-modal";
+
 interface AvatarUploadProps {
     avatarUrl?: string | null;
     onUploadComplete: (url: string | null) => void;
@@ -11,6 +13,8 @@ interface AvatarUploadProps {
 export function AvatarUpload({ avatarUrl, onUploadComplete }: AvatarUploadProps) {
     const [isUploading, setIsUploading] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,30 +67,48 @@ export function AvatarUpload({ avatarUrl, onUploadComplete }: AvatarUploadProps)
         }
     };
 
-    const handleRemoveAvatar = async (e: React.MouseEvent) => {
-        e.stopPropagation(); // Prevent triggering file input
-        if (!avatarUrl) return;
-        
-        const confirmDelete = window.confirm("Are you sure you want to remove your profile picture?");
-        if (!confirmDelete) return;
+    const handleRemoveClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (avatarUrl) setShowDeleteModal(true);
+    };
 
-        setIsUploading(true);
-
+    const confirmDelete = async () => {
+        setIsDeleting(true);
         try {
              const { data: { user } } = await supabase.auth.getUser();
              if (!user) return;
 
-             // Optional: Remove from storage (Logic depends on if we store full path or just public URL)
-             // For now, simpler to just nullify the profile reference. Storage cleanup can be a cron job.
+             // 1. Try to delete from storage (Safe Fail)
+             if (avatarUrl) {
+                 try {
+                     // Extract path from URL: .../avatars/USER_ID/FILENAME
+                     const path = avatarUrl.split('/avatars/')[1];
+                     if (path) {
+                         const { error: storageError } = await supabase.storage
+                            .from('avatars')
+                            .remove([path]);
+                         
+                         if (storageError) {
+                             console.warn("Storage delete failed (non-blocking):", storageError.message);
+                         }
+                     }
+                 } catch (err) {
+                     console.warn("Storage path parsing failed:", err);
+                 }
+             }
              
+             // 2. Clear from Database (Always proceed)
              await supabase.from('profiles').update({ avatar_url: null }).eq('id', user.id);
              
+             // 3. Update State
              onUploadComplete(null);
+             setShowDeleteModal(false);
 
         } catch (error) {
              console.error("Remove Error:", error);
+             alert("Failed to remove avatar. Please try again.");
         } finally {
-             setIsUploading(false);
+             setIsDeleting(false);
         }
     };
 
@@ -144,7 +166,7 @@ export function AvatarUpload({ avatarUrl, onUploadComplete }: AvatarUploadProps)
                             initial={{ opacity: 0, scale: 0.8, x: 10 }}
                             animate={{ opacity: 1, scale: 1, x: 0 }}
                             exit={{ opacity: 0, scale: 0.8, x: 10 }}
-                            onClick={handleRemoveAvatar}
+                            onClick={handleRemoveClick}
                             className="absolute -right-2 top-0 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 p-1.5 rounded-full backdrop-blur-sm transition-colors"
                             title="Remove Avatar"
                         >
@@ -161,6 +183,17 @@ export function AvatarUpload({ avatarUrl, onUploadComplete }: AvatarUploadProps)
                     className="hidden" 
                 />
             </div>
+
+            <ConfirmModal 
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={confirmDelete}
+                title="Remove Avatar"
+                description="Are you sure you want to remove your profile picture? This action cannot be undone."
+                confirmText="Remove"
+                isDestructive
+                isLoading={isDeleting}
+            />
         </div>
     );
 }
