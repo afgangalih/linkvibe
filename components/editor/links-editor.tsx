@@ -21,7 +21,6 @@ import {
 import { LinkCard } from "./link-card";
 import { SocialsEditor } from "./socials-editor";
 
-// Icon map for active bar
 const iconMap: Record<string, any> = {
     globe: Globe,
     youtube: Youtube,
@@ -67,7 +66,6 @@ export function LinksEditor() {
 
   return (
     <div className="space-y-10">
-      {/* Links Section */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
             <div>
@@ -114,7 +112,6 @@ export function LinksEditor() {
         </DndContext>
       </div>
 
-      {/* Socials Section */}
       <div className="pt-6 border-t border-zinc-900">
         <SocialsEditor />
       </div>

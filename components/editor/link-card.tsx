@@ -33,7 +33,6 @@ export function LinkCard({ link }: LinkCardProps) {
   const removeLink = useLinkStore((state) => state.removeLink);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Helper to render icon
   const getIcon = (iconName: string) => {
     const found = itemIcons.find(i => i.name === iconName);
     return found ? found.icon : Globe;
@@ -64,7 +63,6 @@ export function LinkCard({ link }: LinkCardProps) {
         link.isActive ? "bg-[#09090b]" : "opacity-75"
       )}>
         <div className="p-3 flex items-center gap-3">
-          {/* Drag Handle */}
           <div
             {...attributes}
             {...listeners}
@@ -82,7 +80,6 @@ export function LinkCard({ link }: LinkCardProps) {
           </div>
             
           <div className="flex items-center gap-2">
-            {/* Active Toggle */}
             <Button
                 variant="ghost"
                 size="icon"
@@ -100,7 +97,6 @@ export function LinkCard({ link }: LinkCardProps) {
           </div>
         </div>
         
-        {/* Expanded Details */}
         <AnimatePresence>
             {isExpanded && (
                 <motion.div
@@ -111,7 +107,6 @@ export function LinkCard({ link }: LinkCardProps) {
                 >
                     <div className="p-3 space-y-3">
                         <div className="grid grid-cols-[50px_1fr] gap-3">
-                            {/* Icon Popover Trigger */}
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <button className="w-12 h-12 rounded-lg border border-dashed border-zinc-800 flex flex-col items-center justify-center bg-[#09090b] hover:bg-zinc-900 hover:border-blue-600/50 transition-all group/icon">

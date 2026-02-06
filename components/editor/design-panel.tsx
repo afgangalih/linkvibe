@@ -27,14 +27,12 @@ export function DesignPanel() {
       
       <ScrollArea className="flex-1">
         <div className="p-6 space-y-8 pb-32">
-            {/* AI Section */}
             <section>
                 <AIBioGenerator />
             </section>
 
             <div className="h-px bg-zinc-900" />
 
-            {/* Design Controls */}
             <section className="space-y-6">
                 <Tabs defaultValue="all" className="w-full">
                     <div className="flex items-center justify-between mb-4">

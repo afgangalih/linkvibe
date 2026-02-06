@@ -24,7 +24,6 @@ export function EditorNavbar() {
 
   return (
     <header className="h-16 w-full border-b border-zinc-900 bg-black/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-50">
-      {/* Brand & Context */}
       <div className="flex items-center gap-4">
         <span className="text-white font-bold tracking-tighter text-xl">LinkVibe</span>
         <div className="h-4 w-[1px] bg-zinc-800 hidden md:block" />
@@ -47,7 +46,6 @@ export function EditorNavbar() {
 
      
 
-      {/* Action Suite */}
       <div className="flex items-center gap-2">
         <div className="flex items-center mr-2">
           <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-500 hover:text-white transition-colors">

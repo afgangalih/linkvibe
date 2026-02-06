@@ -42,14 +42,12 @@ export function PreviewCanvas({ scale = 1 }: PreviewCanvasProps) {
 
   return (
     <div className="relative w-full h-full flex items-center justify-center p-8 overflow-hidden">
-      {/* Mobile Device Mockup */}
       <motion.div 
         layout
         style={{ transform: `scale(${scale})` }}
         className="w-[320px] h-[640px] border-[8px] border-[#1a1a1a] rounded-[3rem] bg-black overflow-hidden shadow-2xl relative ring-1 ring-white/10 transition-transform duration-300 ease-out origin-center block"
       >
         
-        {/* Notch/Status Bar */}
         <div className={`absolute top-0 w-full z-20 px-6 py-3 flex justify-between items-center text-[10px] subpixel-antialiased font-medium transition-colors duration-500 ${isLightMode ? 'text-black' : 'text-white'}`}>
             <span>9:41</span>
             <div className="flex items-center gap-1.5">
@@ -58,7 +56,6 @@ export function PreviewCanvas({ scale = 1 }: PreviewCanvasProps) {
             </div>
         </div>
 
-        {/* Template Render */}
         <div className="h-full w-full overflow-y-auto relative no-scrollbar bg-black">
              <ActiveTemplate 
                 profile={profile}
@@ -69,7 +66,6 @@ export function PreviewCanvas({ scale = 1 }: PreviewCanvasProps) {
              />
         </div>
 
-        {/* Custom Scrollbar Hide */}
         <style jsx>{`
             .no-scrollbar::-webkit-scrollbar {
                 display: none;

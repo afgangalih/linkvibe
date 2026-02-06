@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="w-full border-t border-white/5 bg-black py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-          {/* Brand Column */}
+          
           <div className="flex flex-col gap-2">
             <h3 className="text-lg font-semibold tracking-tight text-white">LinkVibe</h3>
             <p className="text-sm text-zinc-500">
@@ -13,7 +13,6 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Links Columns */}
           <div className="flex flex-col gap-4">
             <h4 className="text-sm font-medium text-white">Product</h4>
             <div className="flex flex-col gap-2 text-sm text-zinc-500">

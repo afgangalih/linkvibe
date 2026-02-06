@@ -23,7 +23,6 @@ export function ProfileForm() {
       />
 
       <div className="space-y-4">
-        {/* Username */}
         <div className="space-y-2">
           <Label htmlFor="username" className="text-zinc-300">Username</Label>
           <div className="relative">
@@ -38,7 +37,6 @@ export function ProfileForm() {
           </div>
         </div>
 
-        {/* Display Name */}
         <div className="space-y-2">
             <Label htmlFor="displayName" className="text-zinc-300">Display Name</Label>
             <Input
@@ -50,7 +48,6 @@ export function ProfileForm() {
             />
         </div>
 
-        {/* Bio */}
         <div className="space-y-2">
             <Label htmlFor="bio" className="text-zinc-300">Bio</Label>
             <Textarea

@@ -21,13 +21,12 @@ export function AvatarUpload({ avatarUrl, onUploadComplete }: AvatarUploadProps)
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Validation
         if (!file.type.startsWith("image/")) {
             alert("Please select an image file.");
             return;
         }
 
-        if (file.size > 2 * 1024 * 1024) { // 2MB
+        if (file.size > 2 * 1024 * 1024) {
             alert("File size must be less than 2MB.");
             return;
         }
@@ -41,21 +40,18 @@ export function AvatarUpload({ avatarUrl, onUploadComplete }: AvatarUploadProps)
             const fileExt = file.name.split('.').pop();
             const fileName = `${user.id}/${Date.now()}.${fileExt}`;
 
-            // Upload
             const { error: uploadError } = await supabase.storage
                 .from('avatars')
                 .upload(fileName, file, { upsert: true });
 
             if (uploadError) throw uploadError;
 
-            // Get Public URL
             const { data: { publicUrl } } = supabase.storage
                 .from('avatars')
                 .getPublicUrl(fileName);
 
             onUploadComplete(publicUrl);
 
-            // Also update profile immediately in DB to enforce consistent state
              await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id);
 
         } catch (error) {
@@ -78,10 +74,8 @@ export function AvatarUpload({ avatarUrl, onUploadComplete }: AvatarUploadProps)
              const { data: { user } } = await supabase.auth.getUser();
              if (!user) return;
 
-             // 1. Try to delete from storage (Safe Fail)
              if (avatarUrl) {
                  try {
-                     // Extract path from URL: .../avatars/USER_ID/FILENAME
                      const path = avatarUrl.split('/avatars/')[1];
                      if (path) {
                          const { error: storageError } = await supabase.storage
@@ -97,10 +91,8 @@ export function AvatarUpload({ avatarUrl, onUploadComplete }: AvatarUploadProps)
                  }
              }
              
-             // 2. Clear from Database (Always proceed)
              await supabase.from('profiles').update({ avatar_url: null }).eq('id', user.id);
              
-             // 3. Update State
              onUploadComplete(null);
              setShowDeleteModal(false);
 
@@ -137,14 +129,12 @@ export function AvatarUpload({ avatarUrl, onUploadComplete }: AvatarUploadProps)
                         </div>
                     )}
 
-                    {/* Loading Overlay */}
                     {isUploading && (
                         <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20">
                             <Loader2 className="w-6 h-6 text-white animate-spin" />
                         </div>
                     )}
 
-                    {/* Hover Overlay */}
                     <AnimatePresence>
                         {isHovered && !isUploading && (
                             <motion.div
@@ -159,7 +149,6 @@ export function AvatarUpload({ avatarUrl, onUploadComplete }: AvatarUploadProps)
                     </AnimatePresence>
                 </motion.div>
                 
-                {/* Remove Button - Positioned absolute relative to the group */}
                 <AnimatePresence>
                      {isHovered && avatarUrl && !isUploading && (
                         <motion.button
