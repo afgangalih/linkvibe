@@ -53,15 +53,12 @@ export function LiquidTemplate({ profile, links, socials, font, theme = "liquid-
 
   return (
     <div className={`min-h-full flex flex-col items-center relative ${style.bg} ${style.text} ${font}`}>
-      {/* Curved Header */}
       <div className={`absolute top-0 left-0 w-full h-[35%] rounded-b-[60px] overflow-hidden ${style.header}`}>
          <div className="absolute inset-0 opacity-30 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay" />
       </div>
 
-      {/* Content Container (Padded to account for header) */}
       <div className="z-10 w-full flex flex-col items-center pt-[20%] px-5 pb-6 flex-1">
         
-        {/* Profile (Overlapping) */}
         <div className="flex flex-col items-center text-center space-y-4 mb-8 w-full">
             <div className="w-28 h-28 flex items-center justify-center overflow-hidden relative rounded-full border-4 border-transparent bg-white shadow-xl ring-4 ring-black/5">
             {profile.avatarUrl ? (
@@ -76,7 +73,6 @@ export function LiquidTemplate({ profile, links, socials, font, theme = "liquid-
             </div>
         </div>
 
-        {/* Links */}
         <div className="w-full space-y-3 mb-8">
             <AnimatePresence mode="popLayout">
             {activeLinks.map((link) => {
@@ -105,7 +101,6 @@ export function LiquidTemplate({ profile, links, socials, font, theme = "liquid-
                     </div>
                 ) : (
                     <div className="flex items-center justify-center gap-2">
-                        {/* Icon */}
                         {Icon && (
                              <motion.div
                                 initial={{ opacity: 0, scale: 0.5 }}
@@ -123,7 +118,6 @@ export function LiquidTemplate({ profile, links, socials, font, theme = "liquid-
             </AnimatePresence>
         </div>
 
-        {/* Socials */}
         {activeSocials.length > 0 && (
             <div className="flex flex-wrap justify-center gap-4 mb-8">
             {activeSocials.map((social) => {
@@ -143,7 +137,6 @@ export function LiquidTemplate({ profile, links, socials, font, theme = "liquid-
             </div>
         )}
 
-        {/* Footer */}
         <div className="mt-auto pt-4 pb-2 flex items-center justify-center gap-1.5 opacity-50">
             <Link2 className="w-3 h-3" />
             <span className="text-[10px] font-medium tracking-wide">LinkVibe</span>

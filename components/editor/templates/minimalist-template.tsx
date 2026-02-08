@@ -5,7 +5,6 @@ import { getIcon } from "./icon-map";
 import { Link2, Link as LinkIcon, Instagram, Twitter, Linkedin, Github, Youtube, Facebook } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Helper for Social Icons
 const socialIcons: Record<string, any> = {
     instagram: Instagram,
     twitter: Twitter,
@@ -21,7 +20,6 @@ export function MinimalistTemplate({ profile, links, socials, font }: TemplatePr
 
   return (
     <div className={`min-h-full flex flex-col items-center pt-16 pb-6 px-5 bg-black text-white ${font}`}>
-      {/* Profile */}
       <div className="flex flex-col items-center text-center space-y-4 mb-8 w-full">
         <div className="w-24 h-24 flex items-center justify-center overflow-hidden relative rounded-full bg-white/5 border border-white/10">
           {profile.avatarUrl ? (
@@ -36,7 +34,6 @@ export function MinimalistTemplate({ profile, links, socials, font }: TemplatePr
         </div>
       </div>
 
-      {/* Links */}
       <div className="w-full space-y-3 mb-8">
         <AnimatePresence mode="popLayout">
           {activeLinks.map((link) => {
@@ -74,7 +71,6 @@ export function MinimalistTemplate({ profile, links, socials, font }: TemplatePr
         </AnimatePresence>
       </div>
 
-      {/* Socials */}
       {activeSocials.length > 0 && (
         <div className="flex flex-wrap justify-center gap-4 mb-8">
           {activeSocials.map((social) => {
@@ -94,7 +90,6 @@ export function MinimalistTemplate({ profile, links, socials, font }: TemplatePr
         </div>
       )}
 
-      {/* Footer */}
       <div className="mt-auto pt-4 pb-2 flex items-center justify-center gap-1.5 opacity-50">
         <Link2 className="w-3 h-3" />
         <span className="text-[10px] font-medium tracking-wide">LinkVibe</span>

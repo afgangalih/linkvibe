@@ -14,8 +14,17 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export function EditorNavbar() {
-  const syncStatus = useLinkStore((state) => state.syncStatus);
+  const { profile, syncStatus } = useLinkStore();
   const router = useRouter();
+  const username = profile?.username;
+
+  const handlePreview = () => {
+    if (!username || username === 'user') {
+        alert("Please set a username first in the settings!");
+        return;
+    }
+    window.open(`/${username}`, '_blank');
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -44,11 +53,14 @@ export function EditorNavbar() {
         </div>
       </div>
 
-     
-
       <div className="flex items-center gap-2">
         <div className="flex items-center mr-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-500 hover:text-white transition-colors">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={handlePreview}
+            className="h-8 w-8 text-zinc-500 hover:text-white transition-colors"
+          >
             <Eye className="w-4 h-4" />
           </Button>
           <div className="h-4 w-[1px] bg-zinc-800 mx-1" />
