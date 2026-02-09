@@ -15,8 +15,8 @@ const socialIcons: Record<string, any> = {
 };
 
 export function RetroTemplate({ profile, links, socials, font }: TemplateProps) {
-  const activeSocials = socials?.filter(s => Boolean(s.isActive || s.is_active)) || [];
-  const activeLinks = links?.filter(l => Boolean(l.isActive || l.is_active)) || [];
+  const activeSocials = socials?.filter(s => s.isActive === true) || [];
+  const activeLinks = links?.filter(l => l.isActive === true) || [];
 
   return (
     <div className={`min-h-full flex flex-col items-center pt-16 pb-6 px-5 bg-[#f0f0e0] text-[#2a2a2a] ${font}`}>
@@ -74,7 +74,7 @@ export function RetroTemplate({ profile, links, socials, font }: TemplateProps) 
       {activeSocials.length > 0 && (
         <div className="flex flex-wrap justify-center gap-4 mb-8">
           {activeSocials.map((social) => {
-            const Icon = socialIcons[social.platform.toLowerCase()] || LinkIcon;
+            const Icon = socialIcons[social.platform] || LinkIcon;
             return (
               <a
                 key={social.id}

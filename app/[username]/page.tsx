@@ -92,16 +92,16 @@ export default async function PublicProfilePage({ params }: PageProps) {
         id: l.id,
         title: l.title,
         url: l.url,
-        isActive: Boolean(l.is_active ?? l.isActive),
+        isActive: Boolean(l.is_active),
         image: l.image || "",
         icon: l.icon || "",
     }));
 
     const mappedSocials = socials.map((s: any) => ({
         id: s.id,
-        platform: s.platform,
+        platform: s.platform.toLowerCase(),
         url: s.url,
-        isActive: Boolean(s.is_active ?? s.isActive)
+        isActive: Boolean(s.is_active)
     }));
 
     const backgroundMap: Record<string, string> = {
