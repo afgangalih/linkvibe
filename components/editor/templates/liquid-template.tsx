@@ -46,8 +46,8 @@ const variants: Record<string, { header: string; bg: string; text: string; card:
 };
 
 export function LiquidTemplate({ profile, links, socials, font, theme = "liquid-blue" }: TemplateProps & { theme?: string }) {
-  const activeSocials = socials.filter(s => s.isActive);
-  const activeLinks = links.filter(l => l.isActive);
+  const activeSocials = socials?.filter(s => Boolean(s.isActive || s.is_active)) || [];
+  const activeLinks = links?.filter(l => Boolean(l.isActive || l.is_active)) || [];
   
   const style = variants[theme] || variants["liquid-blue"];
 
@@ -121,7 +121,7 @@ export function LiquidTemplate({ profile, links, socials, font, theme = "liquid-
         {activeSocials.length > 0 && (
             <div className="flex flex-wrap justify-center gap-4 mb-8">
             {activeSocials.map((social) => {
-                const Icon = socialIcons[social.platform] || LinkIcon;
+                const Icon = socialIcons[social.platform.toLowerCase()] || LinkIcon;
                 return (
                 <a
                     key={social.id}

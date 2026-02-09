@@ -61,7 +61,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
     const socials = socialsResult.data || [];
 
     const themeMap: Record<string, any> = {
-        'glass': GlassTemplate,
+        'glassmorphism': GlassTemplate,
         'retro': RetroTemplate,
         'minimalist': MinimalistTemplate,
         'neon': NeonTemplate,
@@ -76,6 +76,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
     
     if (!SelectedTemplate) {
         if (templateKey.startsWith('liquid')) SelectedTemplate = LiquidTemplate;
+        else if (templateKey === 'glass') SelectedTemplate = GlassTemplate;
         else SelectedTemplate = MinimalistTemplate;
     }
 
@@ -91,7 +92,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
         id: l.id,
         title: l.title,
         url: l.url,
-        isActive: l.is_active,
+        isActive: Boolean(l.is_active ?? l.isActive),
         image: l.image || "",
         icon: l.icon || "",
     }));
@@ -100,10 +101,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
         id: s.id,
         platform: s.platform,
         url: s.url,
-        isActive: s.is_active
+        isActive: Boolean(s.is_active ?? s.isActive)
     }));
 
     const backgroundMap: Record<string, string> = {
+        'glassmorphism': 'bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900',
         'glass': 'bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900',
         'retro': 'bg-[#f0f0e0]',
         'minimalist': 'bg-black',
