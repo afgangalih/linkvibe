@@ -3,6 +3,7 @@ import { GlassTemplate } from "./glass-template";
 import { NeonTemplate } from "./neon-template";
 import { RetroTemplate } from "./retro-template";
 import { LiquidTemplate } from "./liquid-template";
+import { LuxuryTemplate } from "./luxury-template";
 
 export const TemplateRegistry: Record<string, React.FC<any>> = {
     "minimalist": MinimalistTemplate,
@@ -13,6 +14,7 @@ export const TemplateRegistry: Record<string, React.FC<any>> = {
     "liquid-pink": LiquidTemplate,
     "liquid-mint": LiquidTemplate,
     "liquid-vivid": LiquidTemplate,
+    "luxury-dark": LuxuryTemplate,
 };
 
 export const TemplateThemes = [
@@ -24,4 +26,5 @@ export const TemplateThemes = [
     { id: "liquid-pink", name: "Liquid Pink", type: 'light', color: "bg-gradient-to-b from-pink-400 to-white border-pink-200" },
     { id: "liquid-mint", name: "Liquid Mint", type: 'light', color: "bg-gradient-to-b from-teal-400 to-white border-teal-200" },
     { id: "liquid-vivid", name: "Liquid Vivid", type: 'dark', color: "bg-gradient-to-b from-violet-600 to-black border-violet-600" },
+    { id: "luxury-dark", name: "Luxury Dark", type: 'dark', color: "bg-[#0a0a0c] border-[#D4AF37] shadow-xl" },
 ];

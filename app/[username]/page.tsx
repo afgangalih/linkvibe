@@ -6,6 +6,7 @@ import { RetroTemplate } from "@/components/editor/templates/retro-template";
 import { MinimalistTemplate } from "@/components/editor/templates/minimalist-template";
 import { NeonTemplate } from "@/components/editor/templates/neon-template";
 import { LiquidTemplate } from "@/components/editor/templates/liquid-template";
+import { LuxuryTemplate } from "@/components/editor/templates/luxury-template";
 
 interface PageProps {
     params: Promise<{ username: string }>;
@@ -69,6 +70,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
         'liquid-pink': LiquidTemplate,
         'liquid-mint': LiquidTemplate,
         'liquid-vivid': LiquidTemplate,
+        'luxury-dark': LuxuryTemplate,
     };
 
     const templateKey = profile.theme_id || 'minimalist';
@@ -114,6 +116,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
         'liquid-pink': 'bg-gradient-to-b from-pink-400 via-rose-300 to-white',
         'liquid-mint': 'bg-gradient-to-b from-teal-400 via-emerald-300 to-white',
         'liquid-vivid': 'bg-gradient-to-b from-violet-600 via-fuchsia-600 to-black',
+        'luxury-dark': 'bg-[#0a0a0c]',
     };
 
     const outerBg = backgroundMap[templateKey] || 'bg-black';
