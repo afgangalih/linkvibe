@@ -7,6 +7,8 @@ import { MinimalistTemplate } from "@/components/editor/templates/minimalist-tem
 import { NeonTemplate } from "@/components/editor/templates/neon-template";
 import { LiquidTemplate } from "@/components/editor/templates/liquid-template";
 import { LuxuryTemplate } from "@/components/editor/templates/luxury-template";
+import { fontVariables } from "./font-registry";
+import { FontStyleInjector } from "./font-loader";
 
 interface PageProps {
     params: Promise<{ username: string }>;
@@ -122,18 +124,20 @@ export default async function PublicProfilePage({ params }: PageProps) {
     const outerBg = backgroundMap[templateKey] || 'bg-black';
 
     return (
-        <div className="w-full min-h-screen flex md:items-center md:justify-center relative">
+        <div className={`w-full min-h-screen flex md:items-center md:justify-center relative ${fontVariables}`}>
              <div className={`fixed inset-0 z-[-1] ${outerBg}`} />
              
              <div className="w-full min-h-screen md:w-[400px] md:min-h-0 md:h-[850px] md:max-h-[90vh] md:rounded-[45px] md:border-[8px] md:border-zinc-900 md:shadow-2xl overflow-hidden relative z-10 transition-all duration-300">
                 <div className="w-full h-full overflow-y-auto no-scrollbar">
-                     <SelectedTemplate 
-                        profile={mappedProfile} 
-                        links={mappedLinks} 
-                        socials={mappedSocials} 
-                        font={profile.font_id || 'Inter'}
-                        theme={templateKey} 
-                     />
+                     <FontStyleInjector fontId={profile.font_id}>
+                        <SelectedTemplate 
+                           profile={mappedProfile} 
+                           links={mappedLinks} 
+                           socials={mappedSocials} 
+                           font={profile.font_id || 'Inter'}
+                           theme={templateKey} 
+                        />
+                     </FontStyleInjector>
                 </div>
              </div>
         </div>
